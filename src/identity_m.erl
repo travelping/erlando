@@ -14,7 +14,9 @@
 %% Copyright (c) 2011-2013 VMware, Inc.  All rights reserved.
 %%
 
--module(identity_m).
+-module(identity_m, [NotUsed]).
+
+-compile({parse_transform, pmod_pt}).
 
 -behaviour(monad).
 -export(['>>='/2, return/1, fail/1]).

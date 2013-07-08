@@ -26,7 +26,9 @@
 %%    of results will always be reachable.
 %%
 
--module(omega_m).
+-module(omega_m, [NotUsed]).
+
+-compile({parse_transform, pmod_pt}).
 
 -behaviour(monad).
 -export(['>>='/2, return/1, fail/1]).

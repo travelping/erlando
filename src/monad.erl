@@ -28,9 +28,9 @@
 -compile({parse_transform, do}).
 
 behaviour_info(callbacks) ->
-    [{'>>=',  2},
-     {return, 1},
-     {fail,   1}];
+    [{'>>=',  3},
+     {return, 2},
+     {fail,   2}];
 behaviour_info(_Other) ->
     undefined.
 

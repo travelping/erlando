@@ -30,8 +30,8 @@
 -compile({parse_transform, cut}).
 
 behaviour_info(callbacks) ->
-    [{mzero, 0},
-     {mplus, 2}];
+    [{mzero, 1},
+     {mplus, 3}];
 behaviour_info(_Other) ->
     undefined.
 

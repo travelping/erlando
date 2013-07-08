@@ -16,7 +16,9 @@
 
 %% List Monad. Mainly just for fun! As normal, this is depth first.
 
--module(list_m).
+-module(list_m, [NotUsed]).
+
+-compile({parse_transform, pmod_pt}).
 
 -behaviour(monad).
 -export(['>>='/2, return/1, fail/1]).

@@ -15,6 +15,7 @@
 %%
 
 -module(state_t, [InnerMonad]).
+-compile({parse_transform, pmod_pt}).
 -compile({parse_transform, do}).
 
 -behaviour(monad).
