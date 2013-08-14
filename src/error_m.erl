@@ -14,11 +14,8 @@
 %% Copyright (c) 2011-2013 VMware, Inc.  All rights reserved.
 %%
 
--module(error_m, [NotUsed]).
+-module(error_m).
 
--compile({parse_transform, pmod_pt}).
-
--behaviour(monad).
 -export(['>>='/2, return/1, fail/1]).
 
 %% This is really instance (Error e) => Monad (Either e) with 'error'
