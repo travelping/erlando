@@ -186,6 +186,9 @@ expr({atom, Line, A}, _MonadStack)    -> {atom, Line, A};
 expr({string, Line, S}, _MonadStack)  -> {string, Line, S};
 expr({char, Line, C}, _MonadStack)    -> {char, Line, C};
 expr({nil, Line}, _MonadStack)        -> {nil, Line};
+%% don't know how to treat map's (yet), just pass them through
+expr({map, Line, V, M}, _MonadStack)  -> {map, Line, V, M};
+expr({map, Line, V}, _MonadStack)  -> {map, Line, V};
 expr({cons, Line, H0, T0}, MonadStack) ->
     H1 = expr(H0, MonadStack),
     T1 = expr(T0, MonadStack), %% They see the same variables
