@@ -1,6 +1,6 @@
 {application, erlando,
  [{description, "Syntax extensions for Erlang"},
-  {vsn, "%%VSN%%"},
+  {vsn, git},
   {modules, []},
   {registered, []},
   {applications, []}]}.
