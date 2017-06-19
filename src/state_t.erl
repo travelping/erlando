@@ -17,11 +17,12 @@
 -module(state_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
+-behaviour(monad_state).
 
 -export_type([state_t/3]).
 
 -export([new/1, '>>='/3, return/2, fail/2]).
--export([get/1, put/2, eval/3, exec/3, run/3,
+-export([get/1, put/2, state/2, eval/3, exec/3, run/3,
          modify/2, modify_and_return/2, lift/2]).
 
 -opaque state_t(S, M, A) :: fun( (S) -> monad:monadic(M, {A, S}) ).
@@ -67,6 +68,11 @@ put(S, {?MODULE, M}) ->
             M:return({ok, S})
     end.
 
+-spec state(fun((S) -> {S, A}), M) -> state_t(S, M, A).
+state(Fun, {?MODULE, M}) ->
+    fun(S) ->
+            M:return(Fun(S))
+    end.
 
 -spec eval(state_t(S, M, A), S, M) -> monad:monadic(M, A).
 eval(SM, S, {?MODULE, M}) ->
@@ -93,9 +99,7 @@ modify(Fun, {?MODULE, M}) ->
 
 -spec modify_and_return(fun( (S) -> {A, S} ), M) -> state_t(S, M, A).
 modify_and_return(Fun, {?MODULE, M}) ->
-    fun (S) ->
-            M:return(Fun(S))
-    end.
+    state(Fun, {?MODULE, M}).
 
 
 -spec lift(monad:monadic(M, A), M) -> state_t(_S, M, A).
