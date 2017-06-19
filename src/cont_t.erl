@@ -17,7 +17,7 @@
 -module(cont_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
--behaviour(monad_cont).
+-behaviour(monad_cont_trans).
 
 -export_type([cont_t/3]).
 

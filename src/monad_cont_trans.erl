@@ -8,6 +8,6 @@
 %% the License for the specific language governing rights and
 %% limitations under the License.
 
--module(monad_cont).
+-module(monad_cont_trans).
 
 -callback callCC(fun((fun( (A) -> monad:monadic(M, _B) ))-> monad:monadic(M, A)), M) -> monad:monadic(M, A).

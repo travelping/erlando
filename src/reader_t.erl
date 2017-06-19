@@ -17,7 +17,7 @@
 -module(reader_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
--behaviour(monad_reader).
+-behaviour(monad_reader_trans).
 
 -export_type([reader_t/3]).
 

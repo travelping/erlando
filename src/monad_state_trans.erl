@@ -8,7 +8,7 @@
 %% the License for the specific language governing rights and
 %% limitations under the License.
 
--module(monad_state).
+-module(monad_state_trans).
 
 -callback get(M) -> monad:monadic(M, _S).
 -callback put(_S, M)  -> monad:monadic(M, ok).

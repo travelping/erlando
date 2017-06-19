@@ -17,7 +17,7 @@
 -module(state_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
--behaviour(monad_state).
+-behaviour(monad_state_trans).
 
 -export_type([state_t/3]).
 

@@ -8,7 +8,7 @@
 %% the License for the specific language governing rights and
 %% limitations under the License.
 
--module(monad_reader).
+-module(monad_reader_trans).
 
 -callback ask(M) -> monad:monadic(M, _R).
 -callback local(fun((R) -> R), monad:monadic(M, R), M) -> monad:monadic(M, R).
