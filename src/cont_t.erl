@@ -17,6 +17,7 @@
 -module(cont_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
+-behaviour(monad_cont).
 
 -export_type([cont_t/3]).
 
@@ -25,6 +26,8 @@
 -opaque cont_t(R, M, A) :: fun((fun((A) -> monad:monadic(M, R))) -> monad:monadic(M, R) ).
 
 -spec new(M) -> TM when TM :: monad:monad(), M :: monad:monad().
+
+
 new(M) ->
     {?MODULE, M}.
 
@@ -51,17 +54,17 @@ fail(E, {?MODULE, M}) ->
 
 -spec lift(monad:monadic(M, A), M) -> cont_t(_R, M, A).
 lift(X, {?MODULE, M}) ->
-    fun(F) ->
+    fun (F) ->
             M:'>>='(X, F)
     end.
 
 -spec callCC(fun((fun( (A) -> cont_t(R, M, _B) ))-> cont_t(R, M, A)), M) -> cont_t(R, M, A).
 callCC(F, {?MODULE, _M}) ->
-    fun(H) ->
+    fun (CC) ->
             (F(
                fun(A) ->
                        fun(_) ->
-                               H(A)
+                               CC(A)
                        end
-               end))(H)
+               end))(CC)
     end.
