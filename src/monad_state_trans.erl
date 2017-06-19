@@ -10,6 +10,6 @@
 
 -module(monad_state_trans).
 
--callback get(M) -> monad:monadic(M, _S).
--callback put(_S, M)  -> monad:monadic(M, ok).
--callback state(fun((S) -> {A, S}), M) -> monad:monadic(M, A).
+-callback get(M) -> monad:monadic(TM, _S) when TM :: monad:monad(), M :: monad:monad().
+-callback put(_S, M)  -> monad:monadic(TM, ok) when TM :: monad:monad(), M :: monad:monad().
+-callback state(fun((S) -> {A, S}), M) -> monad:monadic(TM, A) when TM :: monad:monad(), M :: monad:monad().

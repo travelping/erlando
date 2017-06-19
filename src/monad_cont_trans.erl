@@ -10,4 +10,4 @@
 
 -module(monad_cont_trans).
 
--callback callCC(fun((fun( (A) -> monad:monadic(M, _B) ))-> monad:monadic(M, A)), M) -> monad:monadic(M, A).
+-callback callCC(fun((fun( (A) -> monad:monadic(M, _B) ))-> monad:monadic(TM, A)), M) -> monad:monadic(TM, A) when TM :: monad:monad(), M :: monad:monad().
