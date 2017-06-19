@@ -17,15 +17,18 @@
 -module(reader_t).
 -compile({parse_transform, do}).
 -behaviour(monad_trans).
+-behaviour(monad_reader).
 
 -export_type([reader_t/3]).
 
--export([new/1, '>>='/3, return/2, fail/2, lift/2, ask/1]).
+-export([new/1, '>>='/3, return/2, fail/2, lift/2]).
+-export([ask/1, local/3, reader/2]).
 
 -opaque reader_t(R, M, A) :: fun( (A) -> monad:monadic(M, R)).
 
-
 -spec new(M) -> TM when TM :: monad:monad(), M :: monad:monad().
+
+
 new(M) ->
     {?MODULE, M}.
 
@@ -46,7 +49,6 @@ return(A, {?MODULE, M}) ->
             M:return(A)
     end.
 
-
 -spec fail(any(), M) -> reader_t(_R, M, _A).
 fail(E, {?MODULE, M}) ->
     fun (_) ->
@@ -64,3 +66,16 @@ ask({?MODULE, M}) ->
     fun(R) ->
             M:return(R)
     end.
+
+
+-spec local(fun( (R) -> R), reader_t(R, M, A), M) -> reader_t(R, M, A).
+local(F, RA, {?MODULE, _M}) ->
+    fun(R) ->
+            RA(F(R))
+    end.
+
+-spec reader(fun( (R) -> A), M) -> reader_t(R, M, A).
+reader(F, {?MODULE, M}) ->
+    fun(R) ->
+         M:return(F(R))
+    end.   
