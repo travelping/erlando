@@ -152,13 +152,13 @@ test_reader_t_ask() ->
     [{doc, "Test reader_t"}].
 
 test_reader_t_ask(_Config) ->
-    M = reader_t:new(identity_m),
-    Monad = 
-        do([M ||
-               Local <- M:ask(),
+    Monad = reader_t:new(identity_m),
+    M0 = 
+        do([Monad ||
+               Local <- Monad:ask(),
                return({Local, world})
            ]),
-    ?assertEqual({hello, world}, Monad(hello)).
+    ?assertEqual({hello, world}, Monad:run(M0, hello)).
 
 
 test_monad_laws(_Config) ->
@@ -211,9 +211,9 @@ test_monad_laws(_Config) ->
                 G(Y)
             ]),
     
-    ?assertEqual({ok, 97}, M5(10)),
-    ?assertEqual({ok, 97}, M6(10)),
-    ?assertEqual({ok, 97}, M7(10)).
+    ?assertEqual({ok, 97}, Monad:run(M5, 10)),
+    ?assertEqual({ok, 97}, Monad:run(M6, 10)),
+    ?assertEqual({ok, 97}, Monad:run(M7, 10)).
                
 
 test_monad_fail(_Config) ->
@@ -233,7 +233,7 @@ test_monad_lift(_Config) ->
                 return(X * Y)
             ]),
     
-    ?assertEqual({ok, 60}, M0(6)).
+    ?assertEqual({ok, 60}, Monad:run(M0, 6)).
 
 test_local(_Config) ->
     Monad = reader_t:new(error_m),
@@ -244,7 +244,7 @@ test_local(_Config) ->
             ]),
     
     M1 = Monad:local(fun(X) -> X * 2 end, M0),
-    ?assertEqual({ok, 120}, M1(6)).
+    ?assertEqual({ok, 120}, Monad:run(M1, 6)).
 
 test_reader(_Config) ->
     Monad = reader_t:new(error_m),
@@ -255,4 +255,4 @@ test_reader(_Config) ->
             ]),
     M1 = Monad:reader(M0),
 
-    ?assertEqual({ok, 3}, M1([1,2,3])).
+    ?assertEqual({ok, 3}, Monad:run(M1, [1,2,3])).
