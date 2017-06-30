@@ -125,7 +125,7 @@ all(doc) ->
     ["Describe the main purpose of this suite"].
 
 all() -> 
-    [test_cont_t].
+    [test_cont_t, test_cont_t_callCC].
 
 
 %%--------------------------------------------------------------------
@@ -167,3 +167,39 @@ test_cont_t(_Config) ->
                return(R1 + R2)]),
     CC = fun(X) -> {ok, X} end,
     ?assertEqual({ok, 5}, (R)(CC)).
+
+
+test_cont_t_callCC(_Config) ->
+    MonadState = state_t:new(identity_m),
+    Monad = cont_t:new(MonadState),
+    
+    M0 = 
+        do([Monad ||
+               Value <- Monad:callCC(
+                          fun(K) ->
+                                  do([Monad ||
+                                         Acc <- Monad:lift(MonadState:get()),
+                                         Monad:lift(MonadState:put([K|Acc])),
+                                         return(0)
+                                     ])
+                          end),
+               begin
+                   do([Monad ||
+                          Acc <- Monad:lift(MonadState:get()),
+                          case Acc of
+                              [] ->
+                                  return(1 + Value);
+                              [K|T] ->
+                                  do([Monad ||
+                                         Monad:lift(MonadState:put(T)),
+                                         K(3)])
+                          end
+                      ])
+               end
+           ]),
+    Value = MonadState:eval(Monad:run(M0, fun(X) -> MonadState:return(X) end), []),
+    ?assertEqual(4, Value).
+    
+    
+                       
+                       

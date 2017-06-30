@@ -25,7 +25,7 @@
 -export([ask/1, local/3, reader/2]).
 -export([run/3]).
 
--opaque reader_t(R, M, A) :: fun( (A) -> monad:monadic(M, R)).
+-opaque reader_t(R, M, A) :: fun( (R) -> monad:monadic(M, A)).
 
 -spec new(M) -> TM when TM :: monad:monad(), M :: monad:monad().
 
@@ -72,7 +72,8 @@ ask({?MODULE, M}) ->
 -spec local(fun( (R) -> R), reader_t(R, M, A), M) -> reader_t(R, M, A).
 local(F, RA, {?MODULE, _M}) ->
     fun(R) ->
-            RA(F(R))
+            NR = F(R),
+            RA(NR)
     end.
 
 -spec reader(fun( (R) -> A), M) -> reader_t(R, M, A).

@@ -35,4 +35,4 @@ return(X) -> X.
 
 -spec fail(any()) -> identity_m(_A).
 fail(E) ->
-    throw({error, E}).
+    exit({error, E}).

@@ -37,7 +37,8 @@ new(M) ->
 '>>='(X, Fun, {?MODULE, M}) ->
     fun (S) ->
             do([M || {A, S1} <- X(S),
-                     (Fun(A))(S1)])
+                     (Fun(A))(S1)
+               ])
     end.
 
 

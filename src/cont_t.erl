@@ -22,12 +22,11 @@
 -export_type([cont_t/3]).
 
 -export([new/1, '>>='/3, return/2, fail/2, lift/2, callCC/2]).
+-export([run/3]).
 
 -opaque cont_t(R, M, A) :: fun((fun((A) -> monad:monadic(M, R))) -> monad:monadic(M, R) ).
 
 -spec new(M) -> TM when TM :: monad:monad(), M :: monad:monad().
-
-
 new(M) ->
     {?MODULE, M}.
 
@@ -57,6 +56,10 @@ lift(X, {?MODULE, M}) ->
     fun (F) ->
             M:'>>='(X, F)
     end.
+
+-spec run(cont_t(R, M, A), fun((A) -> monad:monadic(M, R)), M) -> monad:monadic(M, R).
+run(X, CC, {?MODULE, _M}) ->
+    X(CC).
 
 -spec callCC(fun((fun( (A) -> cont_t(R, M, _B) ))-> cont_t(R, M, A)), M) -> cont_t(R, M, A).
 callCC(F, {?MODULE, _M}) ->
