@@ -3,3 +3,4 @@
 ebin
 test/*.beam
 logs
+*.plt
