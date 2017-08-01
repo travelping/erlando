@@ -21,7 +21,7 @@
 
 -export_type([cont_t/3]).
 
--export([new/1, '>>='/3, return/2, fail/2, lift/2, callCC/2]).
+-export([new/1, '>>='/3, return/2, fail/2, lift/2, callCC/2, lift_local/5]).
 -export([run/3]).
 
 -opaque cont_t(R, M, A) :: fun((fun((A) -> monad:monadic(M, R))) -> monad:monadic(M, R) ).
@@ -70,4 +70,18 @@ callCC(F, {?MODULE, _M}) ->
                                CC(A)
                        end
                end))(CC)
+    end.
+
+lift_local(Ask, Local, F, X, {?MODULE, M}) ->
+    fun(K) ->
+            do([M || 
+                   R <- Ask(),
+                   begin 
+                       NK = 
+                           fun(A) ->
+                                   Local(fun(_) -> R end, K(A))
+                           end,
+                       Local(F, X(NK))
+                   end
+               ])
     end.

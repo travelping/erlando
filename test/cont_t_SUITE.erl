@@ -125,7 +125,7 @@ all(doc) ->
     ["Describe the main purpose of this suite"].
 
 all() -> 
-    [test_cont_t, test_cont_t_callCC].
+    [test_cont_t, test_cont_t_callCC, test_cont_t_local].
 
 
 %%--------------------------------------------------------------------
@@ -199,7 +199,34 @@ test_cont_t_callCC(_Config) ->
            ]),
     Value = MonadState:eval(Monad:run(M0, fun(X) -> MonadState:return(X) end), []),
     ?assertEqual(4, Value).
+
+test_cont_t_local(_Config) ->
+    MR = reader_t:new(identity_m),
+    Monad = cont_t:new(MR),
+    RefO = make_ref(),
+    Ref = make_ref(),
     
-    
-                       
-                       
+    M0 = do([Monad ||
+                Ref0 <- Monad:lift(MR:ask()),
+                return(Ref0)
+            ]),
+    M1 = cont_t_lifted_local(fun(_) -> Ref end, M0),
+    M2 = do([Monad ||
+                Ref0 <- M0,
+                Ref1 <- M1,
+                Ref2 <- Monad:lift(MR:ask()),
+                return({Ref0, Ref1, Ref2})
+            ]),
+    Reader = Monad:run(M2, fun(X) -> MR:return(X) end),
+    {R0, R1, R2}= MR:run(Reader, RefO),
+    ?assertEqual(RefO, R0),
+    ?assertEqual(RefO, R2),
+    ?assertEqual(Ref, R1).
+
+cont_t_lifted_local(F, C) ->
+    MR = reader_t:new(identity_m),
+    Monad = cont_t:new(MR),
+    Monad:lift_local(
+      fun() -> MR:ask() end,
+      fun(IF, X) -> MR:local(IF, X) end,
+      F, C).                       
