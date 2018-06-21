@@ -186,9 +186,6 @@ expr({atom, Line, A})    -> {atom, Line, A};
 expr({string, Line, S})  -> {string, Line, S};
 expr({char, Line, C})    -> {char, Line, C};
 expr({nil, Line})        -> {nil, Line};
-%% don't know how to treat map's (yet), just pass them through
-expr({map, Line, V, M})  -> {map, Line, V, M};
-expr({map, Line, M})     -> {map, Line, M};
 expr({cons, Line, H0, T0} = Cons) ->
     %% We need to find cut vars in T0 _before_ recursing.
     case find_cons_cut_vars([Cons], T0) of
