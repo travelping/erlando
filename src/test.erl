@@ -16,7 +16,7 @@
 
 -module(test).
 -export([test/2]).
--compile({parse_transform, do}).
+-compile([{parse_transform, do}, nowarn_deprecated_function]).
 
 test(Funs, Options) ->
     ErrorT = error_t:new(identity_m),
