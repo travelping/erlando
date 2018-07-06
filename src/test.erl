@@ -69,7 +69,19 @@ test_funs(ErrorT, [Fun|Funs]) when is_function(Fun, 0) ->
     do([ErrorT || hoist(ErrorT, anonymous_function, Fun),
                   test_funs(ErrorT, Funs)]).
 
-
+-ifdef(OTP_RELEASE).
+-if(?OTP_RELEASE >= 21).
+hoist(ErrorT, Label, PlainFun) ->
+    do([ErrorT ||
+           try
+               PlainFun(),
+               return(passed)
+           catch
+               Class:Reason:Trace ->
+                   fail({Label, Class, Reason, Trace})
+           end]).
+-endif.
+-else.
 hoist(ErrorT, Label, PlainFun) ->
     do([ErrorT ||
            try
@@ -79,3 +91,5 @@ hoist(ErrorT, Label, PlainFun) ->
                Class:Reason ->
                    fail({Label, Class, Reason, erlang:get_stacktrace()})
            end]).
+-endif.
+
