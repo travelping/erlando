@@ -1,10 +1,8 @@
 -module(cont_m).
 
--compile(export_all).
-
 -export_type([cont/1]).
 
--export(['>>='/2, return/1, fail/1]).
+-export(['>>='/2, return/1, fail/1, cont/1, run_cont/1]).
 
 -behaviour(monad).
 
@@ -21,6 +19,10 @@ return(X) ->
 
 -spec fail(A) -> cont(A).
 fail(X) -> error(X).
+
+-spec cont(fun((fun ((A) -> any())) -> any())) -> cont(A).
+cont(F) ->
+    {cont, F}.
 
 run_cont({cont, C}) ->
     erlang:apply(C, [fun (A) -> A end]).
