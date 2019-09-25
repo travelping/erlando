@@ -3,4 +3,4 @@
   {vsn, semver},
   {modules, []},
   {registered, []},
-  {applications, []}]}.
+  {applications, [kernel, stdlib]}]}.
