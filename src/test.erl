@@ -18,6 +18,14 @@
 -export([test/2]).
 -compile([{parse_transform, do}, nowarn_deprecated_function]).
 
+-ifdef(OTP_RELEASE). %% this implies 21 or higher
+-define(EXCEPTION(Class, Reason, Stacktrace), Class:Reason:Stacktrace).
+-define(GET_STACK(Stacktrace), Stacktrace).
+-else.
+-define(EXCEPTION(Class, Reason, _), Class:Reason).
+-define(GET_STACK(_), erlang:get_stacktrace()).
+-endif.
+
 test(Funs, Options) ->
     ErrorT = error_t:new(identity_m),
     Result = ErrorT:run(test_funs(ErrorT, Funs)),
@@ -76,6 +84,6 @@ hoist(ErrorT, Label, PlainFun) ->
                PlainFun(),
                return(passed)
            catch
-               Class:Reason:ST ->
-                   fail({Label, Class, Reason, ST})
+               ?EXCEPTION(Class, Reason, Stacktrace) ->
+                   fail({Label, Class, Reason, ?GET_STACK(Stacktrace)})
            end]).
