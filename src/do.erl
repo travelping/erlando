@@ -304,6 +304,13 @@ expr({'catch', Line, E0}, MonadStack) ->
     %% No new variables added.
     E1 = expr(E0, MonadStack),
     {'catch', Line, E1};
+expr({'maybe', Line, Es0}, MonadStack) ->
+    Es1 = exprs(Es0, MonadStack),
+    {'maybe', Line, Es1};
+expr({'maybe', Line, Es0, {else, ElseLine, Cs0}}, MonadStack) ->
+    Es1 = exprs(Es0, MonadStack),
+    Cs1 = icr_clauses(Cs0, MonadStack),
+    {'maybe', Line, Es1, {else, ElseLine, Cs1}};
 expr({'query',  Line,  E0}, MonadStack) ->
     %% lc expression
     E = expr(E0, MonadStack),
@@ -312,6 +319,10 @@ expr({match, Line, P0, E0}, MonadStack) ->
     E1 = expr(E0, MonadStack),
     P1 = pattern(P0),
     {match, Line, P1, E1};
+expr({'maybe_match', Line, P0, E0}, MonadStack) ->
+    E1 = expr(E0, MonadStack),
+    P1 = pattern(P0),
+    {'maybe_match', Line, P1, E1};
 expr({bin, Line, Fs}, _MonadStack) ->
     Fs2 = pattern_grp(Fs),
     {bin, Line, Fs2};
