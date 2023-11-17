@@ -99,6 +99,11 @@ pattern({tuple,Line,Ps0}) ->
 pattern({map, Line, Fields0}) ->
     Fields1 = map_fields(Fields0, []),
     {map, Line, Fields1};
+%% OTP 26.0, EEP 58: Map comprehensions
+pattern({map_field_exact, Line, ExprK0, ExprV0}) ->
+    ExprK1 = expr(ExprK0, []),
+    ExprV0 = expr(ExprV0, []),
+    {map_field_exact, Line, ExprK1, ExprV0};
 %%pattern({struct,Line,Tag,Ps0}) ->
 %%    Ps1 = pattern_list(Ps0),
 %%    {struct,Line,Tag,Ps1};
@@ -195,13 +200,17 @@ expr({cons, Line, H0, T0}, MonadStack) ->
     T1 = expr(T0, MonadStack), %% They see the same variables
     {cons, Line, H1, T1};
 expr({lc, Line, E0, Qs0}, MonadStack) ->
-    Qs1 = lc_bc_quals(Qs0, MonadStack),
+    Qs1 = lc_bc_mc_quals(Qs0, MonadStack),
     E1 = expr(E0, MonadStack),
     {lc, Line, E1, Qs1};
 expr({bc, Line, E0, Qs0}, MonadStack) ->
-    Qs1 = lc_bc_quals(Qs0, MonadStack),
+    Qs1 = lc_bc_mc_quals(Qs0, MonadStack),
     E1 = expr(E0, MonadStack),
     {bc, Line, E1, Qs1};
+expr({mc, Line, E0, Qs0}, MonadStack) ->
+    Qs1 = lc_bc_mc_quals(Qs0, MonadStack),
+    E1 = expr(E0, MonadStack),
+    {mc, Line, E1, Qs1};
 expr({tuple, Line, Es0}, MonadStack) ->
     Es1 = expr_list(Es0, MonadStack),
     {tuple, Line, Es1};
@@ -214,6 +223,11 @@ expr({map, Line, Expr0, Fields0}, MonadStack) ->
     Expr1 = expr(Expr0, MonadStack),
     Fields1 = map_fields(Fields0, MonadStack),
     {map, Line, Expr1, Fields1};
+%% OTP 26.0, EEP 58: Map comprehensions
+expr({map_field_assoc, Line, ExpK0, ExpV0}, MonadStack) ->
+    ExpK1 = expr(ExpK0, MonadStack),
+    ExpV1 = expr(ExpV0, MonadStack),
+    {map_field_assoc, Line, ExpK1, ExpV1};
 expr({record_index, Line, Name, Field0}, MonadStack) ->
     Field1 = expr(Field0, MonadStack),
     {record_index, Line, Name, Field1};
@@ -387,21 +401,25 @@ icr_clauses([C0|Cs], MonadStack) ->
     [C1|icr_clauses(Cs, MonadStack)];
 icr_clauses([], _MonadStack) -> [].
 
-%% -type lc_bc_quals([Qualifier]) -> [Qualifier].
+%% -type lc_bc_mc_quals([Qualifier]) -> [Qualifier].
 %%  Allow filters to be both guard tests and general expressions.
 
-lc_bc_quals([{generate, Line, P0, E0}|Qs], MonadStack) ->
+lc_bc_mc_quals([{generate, Line, P0, E0}|Qs], MonadStack) ->
     E1 = expr(E0, MonadStack),
     P1 = pattern(P0),
-    [{generate, Line, P1, E1}|lc_bc_quals(Qs, MonadStack)];
-lc_bc_quals([{b_generate, Line, P0, E0}|Qs], MonadStack) ->
+    [{generate, Line, P1, E1}|lc_bc_mc_quals(Qs, MonadStack)];
+lc_bc_mc_quals([{b_generate, Line, P0, E0}|Qs], MonadStack) ->
     E1 = expr(E0, MonadStack),
     P1 = pattern(P0),
-    [{b_generate, Line, P1, E1}|lc_bc_quals(Qs, MonadStack)];
-lc_bc_quals([E0|Qs], MonadStack) ->
+    [{b_generate, Line, P1, E1}|lc_bc_mc_quals(Qs, MonadStack)];
+lc_bc_mc_quals([{m_generate, Line, P0, E0}|Qs], MonadStack) ->
     E1 = expr(E0, MonadStack),
-    [E1|lc_bc_quals(Qs, MonadStack)];
-lc_bc_quals([], _MonadStack) -> [].
+    P1 = pattern(P0),
+    [{m_generate, Line, P1, E1}|lc_bc_mc_quals(Qs, MonadStack)];
+lc_bc_mc_quals([E0|Qs], MonadStack) ->
+    E1 = expr(E0, MonadStack),
+    [E1|lc_bc_mc_quals(Qs, MonadStack)];
+lc_bc_mc_quals([], _MonadStack) -> [].
 
 %% -type fun_clauses([Clause]) -> [Clause].
 
