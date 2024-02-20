@@ -321,10 +321,10 @@ expr({'catch', Line, E0}, MonadStack) ->
 expr({'maybe', Line, Es0}, MonadStack) ->
     Es1 = exprs(Es0, MonadStack),
     {'maybe', Line, Es1};
-expr({'maybe', Line, Es0, {else, ElseLine, Cs0}}, MonadStack) ->
+expr({'maybe', Line, Es0, {'else', ElseLine, Cs0}}, MonadStack) ->
     Es1 = exprs(Es0, MonadStack),
     Cs1 = icr_clauses(Cs0, MonadStack),
-    {'maybe', Line, Es1, {else, ElseLine, Cs1}};
+    {'maybe', Line, Es1, {'else', ElseLine, Cs1}};
 expr({'query',  Line,  E0}, MonadStack) ->
     %% lc expression
     E = expr(E0, MonadStack),
