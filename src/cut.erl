@@ -511,14 +511,26 @@ lc_bc_mc_quals([{generate, Line, P0, E0}|Qs]) ->
     E1 = expr(E0),
     P1 = pattern(P0),
     [{generate, Line, P1, E1}|lc_bc_mc_quals(Qs)];
+lc_bc_mc_quals([{generate_strict, Line, P0, E0}|Qs]) ->
+    E1 = expr(E0),
+    P1 = pattern(P0),
+    [{generate_strict, Line, P1, E1}|lc_bc_mc_quals(Qs)];
 lc_bc_mc_quals([{b_generate, Line, P0, E0}|Qs]) ->
     E1 = expr(E0),
     P1 = pattern(P0),
     [{b_generate, Line, P1, E1}|lc_bc_mc_quals(Qs)];
+lc_bc_mc_quals([{b_generate_strict, Line, P0, E0}|Qs]) ->
+    E1 = expr(E0),
+    P1 = pattern(P0),
+    [{b_generate_strict, Line, P1, E1}|lc_bc_mc_quals(Qs)];
 lc_bc_mc_quals([{m_generate, Line, P0, E0}|Qs]) ->
     E1 = expr(E0),
     P1 = pattern(P0),
     [{m_generate, Line, P1, E1}|lc_bc_mc_quals(Qs)];
+lc_bc_mc_quals([{m_generate_strict, Line, P0, E0}|Qs]) ->
+    E1 = expr(E0),
+    P1 = pattern(P0),
+    [{m_generate_strict, Line, P1, E1}|lc_bc_mc_quals(Qs)];
 lc_bc_mc_quals([E0|Qs]) ->
     E1 = expr(E0),
     [E1|lc_bc_mc_quals(Qs)];
@@ -587,17 +599,26 @@ find_record_cut_vars(RecFields) ->
 
 find_comprehension_cut_vars(Qs) ->
     cut_vars(
-      fun ({generate,   _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
-          ({generate,   _Line, _P0, _E0})                      -> [];
-          ({b_generate, _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
-          ({b_generate, _Line, _P0, _E0})                      -> [];
-          ({m_generate, _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
-          ({m_generate, _Line, _P0, _E0})                      -> [];
-          (_)                                                  -> []
+      fun ({generate,          _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({generate,          _Line, _P0, _E0})                      -> [];
+          ({generate_strict,   _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({generate_strict,   _Line, _P0, _E0})                      -> [];
+          ({b_generate,        _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({b_generate,        _Line, _P0, _E0})                      -> [];
+          ({b_generate_strict, _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({b_generate_strict, _Line, _P0, _E0})                      -> [];
+          ({m_generate,        _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({m_generate,        _Line, _P0, _E0})                      -> [];
+          ({m_generate_strict, _Line, _P0, {var, _Line1, '_'} = Var}) -> [Var];
+          ({m_generate_strict, _Line, _P0, _E0})                      -> [];
+          (_)                                                         -> []
       end,
-      fun ({generate,   Line, P0, _Var}, [Var]) -> {generate, Line, P0, Var};
-          ({b_generate, Line, P0, _Var}, [Var]) -> {b_generate, Line, P0, Var};
-          ({m_generate, Line, P0, _Var}, [Var]) -> {m_generate, Line, P0, Var}
+      fun ({generate,          Line, P0, _Var}, [Var]) -> {generate, Line, P0, Var};
+          ({generate_strict,   Line, P0, _Var}, [Var]) -> {generate_strict, Line, P0, Var};
+          ({b_generate,        Line, P0, _Var}, [Var]) -> {b_generate, Line, P0, Var};
+          ({b_generate_strict, Line, P0, _Var}, [Var]) -> {b_generate_strict, Line, P0, Var};
+          ({m_generate,        Line, P0, _Var}, [Var]) -> {m_generate, Line, P0, Var};
+          ({m_generate_strict, Line, P0, _Var}, [Var]) -> {m_generate_strict, Line, P0, Var}
       end,
       Qs).
 
